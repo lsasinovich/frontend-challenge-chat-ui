@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getMessages } from "@/app/_hooks/getMessages";
 import { MessageItem, useMessagesContext } from "@/app/context/MessagesContext";
@@ -24,11 +24,11 @@ export const MessagesContainer = () => {
 
   // !!! I faced with the error in initial page load bottom scrolling,
   // I didn't have enough time to understand the issue, so left initial page without bottom scrolling
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     if (!isFirstRender) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  };
+  }, [isFirstRender]);
 
   useEffect(() => {
     if (isFirstRender && messages.length) {
@@ -45,13 +45,13 @@ export const MessagesContainer = () => {
 
       scrollToBottom();
     }
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     if (error) {
       scrollToBottom();
     }
-  }, [error]);
+  }, [error, scrollToBottom]);
 
   const fetchMessages = async (
     isLongPollingError?: boolean,
