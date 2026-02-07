@@ -57,7 +57,7 @@ export const InputBlock = () => {
       onSubmit={handleSubmit(onSubmit)}
       className="p-sm fixed bottom-0 w-full bg-input-container-background"
     >
-      <div className="max-w-160 mx-auto flex-row flex gap-sm">
+      <div className="max-w-160 mx-auto sm:px-lg flex-row flex gap-sm">
         <Input {...register("message")} />
         <Button />
       </div>
