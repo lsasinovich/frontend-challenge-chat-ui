@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, ReactNode, useState, useContext } from "react";
+import { isEqual } from "lodash";
+
 import { Message } from "../api/schemas/messages";
 
 export type MessageItem = Message & {
@@ -44,19 +46,32 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [error, setError] = useState<string>("");
 
+  const handleSetMessages = (
+    newMessages: MessageItem[],
+    toBeginning?: boolean,
+  ) => {
+    if (!isEqual(messages, newMessages)) {
+      setMessages((prevState) =>
+        toBeginning
+          ? mergeUniqueOrdered(newMessages, prevState)
+          : mergeUniqueOrdered(prevState, newMessages),
+      );
+    }
+  };
+
+  const handleError = (newError: string) => {
+    if (error !== newError) {
+      setError(newError);
+    }
+  };
+
   return (
     <MessagesContext.Provider
       value={{
         messages,
-        setMessages: (newMessages, toBeginning) => {
-          setMessages((prevState) =>
-            toBeginning
-              ? mergeUniqueOrdered(newMessages, prevState)
-              : mergeUniqueOrdered(prevState, newMessages),
-          );
-        },
+        setMessages: handleSetMessages,
         error,
-        setError,
+        setError: handleError,
         addMessage: (message) => setMessages([...messages, message]),
         updateMessage: (id, newMessage) =>
           setMessages((prev) =>

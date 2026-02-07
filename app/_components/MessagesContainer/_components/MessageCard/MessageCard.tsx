@@ -21,7 +21,7 @@ export const MessageCard = ({
   return (
     <div
       className={twMerge(
-        "min-w-[190px] flex flex-col gap-sm w-fit max-w-[70%] border-[2px] border-message-card-border rounded-md text-secondary",
+        "min-w-47.5 flex flex-col gap-sm w-fit max-w-[70%] border-2 border-message-card-border rounded-md text-secondary",
         isIncomeCard
           ? "bg-income-card-background justify-start p-md"
           : "bg-outcome-card-background justify-end self-end pb-sm",

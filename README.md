@@ -33,3 +33,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 4) There is no info in the task description about before query param for gettting messages, but I've checked server and decided to use it
 5) I've added "Load more messages button", if I had more time, I would prefer infinite scroll.
 6) I've hardcoded my name for messages, in reality should be log in function. Left it in context for this. Could be in const as well
+7) I've written only basic tests for the app for now.
+
+#### !!! I faced with the error in initial page load bottom scrolling, I didn't have enough time to understand the issue, so left initial page without bottom scrolling for now.

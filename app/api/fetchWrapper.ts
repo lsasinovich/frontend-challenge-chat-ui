@@ -55,15 +55,12 @@ export const fetchWrapper = async <T extends z.ZodType>(
     }
 
     return parsedData.data;
-  } catch (error: any) {
-    if (error?.message && error?.name) {
-      throw error;
-    } else {
-      throw {
-        message: "Network or unexpected error",
-        error: "UnexpectedError",
-        statusCode: error?.code,
-      };
-    }
+  } catch (error: unknown) {
+    throw {
+      message: "Network or unexpected error",
+      error: "UnexpectedError",
+      statusCode:
+        error instanceof Error ? undefined : (error as { code?: number }).code,
+    };
   }
 };

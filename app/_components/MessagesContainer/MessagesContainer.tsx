@@ -15,31 +15,38 @@ export const MessagesContainer = () => {
   const { messages, setMessages, error, setError } = useMessagesContext();
   const { author } = useUserContext();
 
+  const [isFirstRender, setIsFirstRender] = useState(true);
+
   const [hasMore, setHasMore] = useState(true);
-  const [lastMessage, setLastMessage] = useState<MessageItem | null>(null);
+  const lastMessageRef = useRef<MessageItem | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // !!! I faced with the error in initial page load bottom scrolling,
+  // I didn't have enough time to understand the issue, so left initial page without bottom scrolling
   const scrollToBottom = () => {
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() =>
-        messagesEndRef.current?.scrollIntoView({ behavior: "auto" }),
-      ),
-    );
+    if (!isFirstRender) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   };
+
+  useEffect(() => {
+    if (isFirstRender && messages.length) {
+      setIsFirstRender(false);
+    }
+  }, [isFirstRender, messages.length]);
 
   useEffect(() => {
     const newLastMessage =
       messages.findLast((m) => !m.hasNotBeenSendYet) ?? null;
 
-    // Scroll to bottom if new message is added
-    if (newLastMessage && newLastMessage._id !== lastMessage?._id) {
-      setLastMessage(newLastMessage);
+    if (newLastMessage && newLastMessage._id !== lastMessageRef.current?._id) {
+      lastMessageRef.current = newLastMessage;
+
       scrollToBottom();
     }
   }, [messages]);
 
-  // Scroll to bottom if error occurs, because I want to show the user that something went wrong
   useEffect(() => {
     if (error) {
       scrollToBottom();
@@ -47,7 +54,7 @@ export const MessagesContainer = () => {
   }, [error]);
 
   const fetchMessages = async (
-    errorMessage: string = "Error fetching messages. Please try again later.",
+    isLongPollingError?: boolean,
     createdAt?: string,
   ) => {
     return getMessages(createdAt)
@@ -61,7 +68,11 @@ export const MessagesContainer = () => {
         setError("");
       })
       .catch(() => {
-        setError(errorMessage);
+        if (isLongPollingError) {
+          setError("Your connection is lost.");
+        } else {
+          setError("Error fetching messages.");
+        }
       });
   };
 
@@ -69,14 +80,14 @@ export const MessagesContainer = () => {
     void fetchMessages();
 
     const intervalId = setInterval(
-      () =>
-        void fetchMessages("Your connection is lost.", lastMessage?.createdAt),
+      () => void fetchMessages(true, lastMessageRef.current?.createdAt),
       3000,
     );
 
     return () => {
       clearInterval(intervalId);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadMore = () => {
@@ -96,11 +107,11 @@ export const MessagesContainer = () => {
   };
 
   return (
-    <div className="overflow-y-scroll flex flex-col mx-auto max-w-[640px] gap-md px-lg pt-md pb-[64px]">
+    <div className="overflow-y-scroll flex flex-col mx-auto max-w-160 gap-md px-lg pt-md pb-16">
       {hasMore && !!messages.length && (
         <button
           onClick={loadMore}
-          className="cursor-pointer mx-auto text-primary p-md w-fit border-[2px] rounded-md bg-white border-message-card-border"
+          className="cursor-pointer mx-auto text-primary p-md w-fit border-2 rounded-md bg-white border-message-card-border"
         >
           Load more messages
         </button>
@@ -119,7 +130,7 @@ export const MessagesContainer = () => {
       ))}
 
       {error && (
-        <span className="text-error p-md bg-white rounded-md border-[2px] border-error-border">
+        <span className="text-error p-md bg-white rounded-md border-2 border-error-border">
           {error}
         </span>
       )}

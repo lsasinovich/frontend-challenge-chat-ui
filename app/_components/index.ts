@@ -1,2 +1,2 @@
-export * from "./SearchBlock/SearchBlock";
+export * from "@/app/_components/InputBlock/InputBlock";
 export * from "./MessagesContainer/MessagesContainer";

@@ -1,6 +1,6 @@
 "use client";
 
-import { MessagesContainer, SearchBlock } from "@/app/_components";
+import { MessagesContainer, InputBlock } from "@/app/_components";
 import { MessagesProvider } from "@/app/context/MessagesContext";
 import { UserContext } from "@/app/context/UserContext";
 
@@ -10,7 +10,7 @@ export default function Page() {
       <UserContext.Provider value={{ author: "Lizaveta" }}>
         <MessagesProvider>
           <MessagesContainer />
-          <SearchBlock />
+          <InputBlock />
         </MessagesProvider>
       </UserContext.Provider>
     </div>

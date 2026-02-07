@@ -6,14 +6,14 @@ import { postMessage } from "@/app/_hooks/postMessage";
 import { useMessagesContext } from "@/app/context/MessagesContext";
 import { useUserContext } from "@/app/context/UserContext";
 
-import { Search } from "./_components/Search/Search";
+import { Input } from "./_components/Input/Input";
 import { Button } from "./_components/Button/Button";
 
 type FormData = {
   message: string;
 };
 
-export const SearchBlock = () => {
+export const InputBlock = () => {
   const { register, handleSubmit, setValue } = useForm<FormData>();
 
   const { addMessage, updateMessage } = useMessagesContext();
@@ -23,7 +23,7 @@ export const SearchBlock = () => {
     const newMessage = { message: data.message, author: author };
 
     const createdAt = new Date().toString();
-    const temporaryId = Math.random().toString(36).substring(7);
+    const temporaryId = crypto.randomUUID();
 
     addMessage({
       ...newMessage,
@@ -53,8 +53,8 @@ export const SearchBlock = () => {
       onSubmit={handleSubmit(onSubmit)}
       className="p-sm fixed bottom-0 w-full bg-input-container-background"
     >
-      <div className="max-w-[640px] mx-auto flex-row flex gap-sm">
-        <Search {...register("message")} />
+      <div className="max-w-160 mx-auto flex-row flex gap-sm">
+        <Input {...register("message")} />
         <Button />
       </div>
     </form>

@@ -7,6 +7,7 @@ type ButtonProps = {
 export const Button = ({ buttonText = "Send" }: ButtonProps) => {
   return (
     <button
+      data-testid="send-button"
       type="submit"
       className={twMerge(
         "py-sm px-lg bg-button-background text-white rounded-md cursor-pointer font-semibold",
