@@ -47,7 +47,7 @@ export const MessagesContainer = () => {
   }, [error]);
 
   const fetchMessages = async (
-    shouldHandleError?: boolean,
+    errorMessage: string = "Error fetching messages. Please try again later.",
     createdAt?: string,
   ) => {
     return getMessages(createdAt)
@@ -61,19 +61,16 @@ export const MessagesContainer = () => {
         setError("");
       })
       .catch(() => {
-        if (shouldHandleError) {
-          setError("Error fetching messages. Please try again later.");
-        } else {
-          setError("Your connection is lost.");
-        }
+        setError(errorMessage);
       });
   };
 
   useEffect(() => {
-    void fetchMessages(true);
+    void fetchMessages();
 
     const intervalId = setInterval(
-      () => void fetchMessages(false, lastMessage?.createdAt),
+      () =>
+        void fetchMessages("Your connection is lost.", lastMessage?.createdAt),
       3000,
     );
 
