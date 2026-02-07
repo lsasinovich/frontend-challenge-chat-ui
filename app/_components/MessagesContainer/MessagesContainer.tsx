@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { getMessages } from "@/app/_hooks/getMessages";
 import { MessageItem, useMessagesContext } from "@/app/context/MessagesContext";
@@ -11,30 +11,49 @@ import {
   MessageCardType,
 } from "./_components/MessageCard/MessageCard";
 
-export function MessagesContainer() {
+export const MessagesContainer = () => {
   const { messages, setMessages, error, setError } = useMessagesContext();
   const { author } = useUserContext();
 
+  const [hasMore, setHasMore] = useState(true);
+  const [lastMessage, setLastMessage] = useState<MessageItem | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        messagesEndRef.current?.scrollIntoView({ behavior: "auto" }),
+      ),
+    );
   };
 
-  const lastMessageRef = useRef<MessageItem | null>(null);
-
   useEffect(() => {
-    lastMessageRef.current =
+    const newLastMessage =
       messages.findLast((m) => !m.hasNotBeenSendYet) ?? null;
 
-    scrollToBottom();
-  }, [messages, error]);
+    // Scroll to bottom if new message is added
+    if (newLastMessage && newLastMessage._id !== lastMessage?._id) {
+      setLastMessage(newLastMessage);
+      scrollToBottom();
+    }
+  }, [messages]);
+
+  // Scroll to bottom if error occurs, because I want to show the user that something went wrong
+  useEffect(() => {
+    if (error) {
+      scrollToBottom();
+    }
+  }, [error]);
 
   const fetchMessages = async (
     shouldHandleError?: boolean,
     createdAt?: string,
   ) => {
-    getMessages(createdAt)
+    return getMessages(createdAt)
       .then((allMessages) => {
+        setHasMore(!(allMessages.length <= 50));
+
         if (allMessages.length !== 0) {
           setMessages(allMessages);
         }
@@ -54,7 +73,7 @@ export function MessagesContainer() {
     void fetchMessages(true);
 
     const intervalId = setInterval(
-      () => void fetchMessages(false, lastMessageRef.current?.createdAt),
+      () => void fetchMessages(false, lastMessage?.createdAt),
       3000,
     );
 
@@ -63,8 +82,33 @@ export function MessagesContainer() {
     };
   }, []);
 
+  const loadMore = () => {
+    const oldestDate = messages[0].createdAt;
+
+    getMessages("", oldestDate)
+      .then((oldMessages) => {
+        setHasMore(!!oldMessages.length);
+
+        if (oldMessages.length) {
+          setMessages(oldMessages, true);
+        }
+
+        setError("");
+      })
+      .catch(() => setError("Error fetching older messages."));
+  };
+
   return (
-    <div className="overflow-y-auto flex gap-md flex-col justify-end max-w-content mx-auto px-lg pt-md pb-[80px] min-h-screen">
+    <div className="overflow-y-scroll flex flex-col mx-auto max-w-[640px] gap-md px-lg pt-md pb-[64px]">
+      {hasMore && !!messages.length && (
+        <button
+          onClick={loadMore}
+          className="cursor-pointer mx-auto text-primary p-md w-fit border-[2px] rounded-md bg-white border-message-card-border"
+        >
+          Load more messages
+        </button>
+      )}
+
       {messages.map((item, index) => (
         <MessageCard
           key={`${item.author}-${index}`}
@@ -78,7 +122,7 @@ export function MessagesContainer() {
       ))}
 
       {error && (
-        <span className="text-[#f78166] p-md bg-white rounded-md border-[2px] border-error-border">
+        <span className="text-error p-md bg-white rounded-md border-[2px] border-error-border">
           {error}
         </span>
       )}
@@ -86,4 +130,4 @@ export function MessagesContainer() {
       <div ref={messagesEndRef} />
     </div>
   );
-}
+};

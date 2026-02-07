@@ -12,34 +12,34 @@ type MessageCardProps = {
   message: MessageItem;
 };
 
-export function MessageCard({
+export const MessageCard = ({
   type,
   message: { message, createdAt, author, hasNotBeenSendYet = false, error },
-}: MessageCardProps) {
+}: MessageCardProps) => {
   const isIncomeCard = type === MessageCardType.income;
 
   return (
     <div
       className={twMerge(
-        "min-w-[190px] p-md flex flex-col gap-sm w-fit max-w-[70%] border-[2px] border-message-card-border rounded-md text-secondary",
+        "min-w-[190px] flex flex-col gap-sm w-fit max-w-[70%] border-[2px] border-message-card-border rounded-md text-secondary",
         isIncomeCard
-          ? "bg-income-card-background justify-start"
-          : "bg-outcome-card-background justify-end self-end",
+          ? "bg-income-card-background justify-start p-md"
+          : "bg-outcome-card-background justify-end self-end pb-sm",
       )}
     >
       {isIncomeCard && <span>{author}</span>}
 
-      <div className="flex text-primary">
-        <div className="max-w-full break-all">{message}</div>
+      <div className={twMerge("flex flex-col", !isIncomeCard && "pt-md px-md")}>
+        <div className="max-w-full text-primary break-all">{message}</div>
+
+        {error && <span className="text-error">{error}</span>}
       </div>
 
-      {error && <span className="text-error">{error}</span>}
-
       {!hasNotBeenSendYet && (
-        <span className={!isIncomeCard ? "text-right" : ""}>
+        <span className={!isIncomeCard ? "text-right pr-sm" : ""}>
           {formatDate(new Date(createdAt))}
         </span>
       )}
     </div>
   );
-}
+};

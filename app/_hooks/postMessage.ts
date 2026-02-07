@@ -6,9 +6,9 @@ type PostMessage = {
   author: string;
 };
 
-export function postMessage(message: PostMessage) {
+export const postMessage = (message: PostMessage) => {
   return fetchWrapper("/api/v1/messages", messageSchema, {
     method: "POST",
     body: JSON.stringify(message),
   });
-}
+};

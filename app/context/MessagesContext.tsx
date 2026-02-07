@@ -10,7 +10,7 @@ export type MessageItem = Message & {
 
 type MessagesContextType = {
   messages: MessageItem[];
-  setMessages: (messages: MessageItem[]) => void;
+  setMessages: (messages: MessageItem[], toBeginning?: boolean) => void;
   addMessage: (message: MessageItem) => void;
   error?: string;
   setError: (isError: string) => void;
@@ -48,9 +48,11 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
     <MessagesContext.Provider
       value={{
         messages,
-        setMessages: (newMessages) => {
+        setMessages: (newMessages, toBeginning) => {
           setMessages((prevState) =>
-            mergeUniqueOrdered(prevState, newMessages),
+            toBeginning
+              ? mergeUniqueOrdered(newMessages, prevState)
+              : mergeUniqueOrdered(prevState, newMessages),
           );
         },
         error,
@@ -58,9 +60,9 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
         addMessage: (message) => setMessages([...messages, message]),
         updateMessage: (id, newMessage) =>
           setMessages((prev) =>
-            prev.map((msg) => {
-              return msg._id === id ? { ...msg, ...newMessage } : msg;
-            }),
+            prev.map((msg) =>
+              msg._id === id ? { ...msg, ...newMessage } : msg,
+            ),
           ),
       }}
     >
@@ -69,7 +71,7 @@ export const MessagesProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export function useMessagesContext() {
+export const useMessagesContext = () => {
   const context = useContext(MessagesContext);
 
   if (!context)
@@ -78,4 +80,4 @@ export function useMessagesContext() {
     );
 
   return context;
-}
+};

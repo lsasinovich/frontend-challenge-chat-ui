@@ -13,7 +13,7 @@ type FormData = {
   message: string;
 };
 
-export function SearchBlock() {
+export const SearchBlock = () => {
   const { register, handleSubmit, setValue } = useForm<FormData>();
 
   const { addMessage, updateMessage } = useMessagesContext();
@@ -51,10 +51,10 @@ export function SearchBlock() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex p-xs fixed bottom-0 w-full bg-input-container-background flex gap-xs"
+      className="flex p-sm fixed bottom-0 w-full bg-input-container-background flex gap-sm"
     >
       <Search {...register("message")} />
       <Button />
     </form>
   );
-}
+};

@@ -4,16 +4,14 @@ module.exports = {
   theme: {
     extend: {
       spacing: {
-        xs: "8px",
+        sm: "8px",
         md: "16px",
         lg: "24px",
-      },
-      width: {
-        content: "640px",
       },
       colors: {
         primary: "#474e56",
         secondary: "#b4bcc3",
+        error: "#f78166",
 
         "income-card-background": "#ffffff",
         "outcome-card-background": "#fcf6c5",
