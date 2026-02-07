@@ -20,6 +20,10 @@ export const InputBlock = () => {
   const { author } = useUserContext();
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
+    if (!data.message.trim()) {
+      return;
+    }
+
     const newMessage = { message: data.message, author: author };
 
     const createdAt = new Date().toString();
