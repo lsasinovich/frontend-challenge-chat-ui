@@ -51,10 +51,12 @@ export const SearchBlock = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex p-sm fixed bottom-0 w-full bg-input-container-background flex gap-sm"
+      className="p-sm fixed bottom-0 w-full bg-input-container-background"
     >
-      <Search {...register("message")} />
-      <Button />
+      <div className="max-w-[640px] mx-auto flex-row flex gap-sm">
+        <Search {...register("message")} />
+        <Button />
+      </div>
     </form>
   );
 };
